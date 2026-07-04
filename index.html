@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMatrix Web</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family:monospace;
+}
+
+canvas{
+    display:block;
+}
+
+.info{
+    position:absolute;
+    top:10px;
+    left:15px;
+    color:#00ff00;
+    font-size:14px;
+    text-shadow:0 0 8px #00ff00;
+    opacity:.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="info">CMATRIX WEB</div>
+
+<canvas id="matrix"></canvas>
+
+<script>
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+// Bộ ký tự hỗn hợp
+const chars = (
+`
+アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ
+マミムメモヤユヨラリルレロワヲン
+ぁぃぅぇぉあいうえおかきくけこさしすせそたちつてと
+漢字天地玄黃宇宙洪荒龍虎鳳凰風雷火水木金土日月星空神鬼魔影光闇愛心夢
+零壹貳參肆伍陸柒捌玖
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+abcdefghijklmnopqrstuvwxyz
+0123456789
+@#$%^&*()[]{}<>?/\\|+=-_~:;"',.
+░▒▓█▄▀■□▲▼◆◇○●◎★☆
+`
+).replace(/\s/g,"");
+
+const fontSize = 18;
+const columns = Math.floor(window.innerWidth/fontSize);
+
+const drops = [];
+const speeds = [];
+const lengths = [];
+
+for(let i=0;i<columns;i++){
+    drops[i]=Math.random()*-100;
+    speeds[i]=0.5+Math.random()*2;
+    lengths[i]=5+Math.random()*25;
+}
+
+function draw(){
+
+    // Làm mờ tạo hiệu ứng đuôi
+    ctx.fillStyle="rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font=fontSize+"px monospace";
+
+    for(let i=0;i<columns;i++){
+
+        const x=i*fontSize;
+        const y=drops[i]*fontSize;
+
+        for(let j=0;j<lengths[i];j++){
+
+            const char=chars[Math.floor(Math.random()*chars.length)];
+
+            const py=y-j*fontSize;
+
+            if(py<0) continue;
+
+            if(j==0){
+                ctx.fillStyle="#ffffff";
+                ctx.shadowColor="#ffffff";
+                ctx.shadowBlur=18;
+            }
+            else if(j<3){
+                ctx.fillStyle="#88ff88";
+                ctx.shadowColor="#00ff00";
+                ctx.shadowBlur=12;
+            }
+            else if(j<8){
+                ctx.fillStyle="#00ff00";
+                ctx.shadowColor="#00ff00";
+                ctx.shadowBlur=8;
+            }
+            else{
+                ctx.fillStyle="#007700";
+                ctx.shadowBlur=0;
+            }
+
+            ctx.fillText(char,x,py);
+        }
+
+        drops[i]+=speeds[i];
+
+        if((drops[i]-lengths[i])*fontSize>canvas.height && Math.random()>0.98){
+            drops[i]=-Math.random()*50;
+            speeds[i]=0.5+Math.random()*2;
+            lengths[i]=5+Math.random()*25;
+        }
+    }
+
+    requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>
+
